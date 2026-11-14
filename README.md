@@ -1,6 +1,6 @@
 # Instituto Vitta — Sistema de Agendamento de Consultas
 
-🚀 **Teste a aplicação online:** [Acesse o Instituto Vitta no Render](https://instituto-vitta.onrender.com) *(ou substitua pelo seu link de deploy)*
+🚀 **Teste a aplicação online:** [Acesse o Instituto Vitta no Render](https://instituto-vitta.onrender.com) 
 
 Aplicação web desenvolvida em **Django** para agendamento de consultas médicas e acompanhamento de atendimentos do **Instituto Vitta**.
 
