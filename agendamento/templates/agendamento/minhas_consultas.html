@@ -1,0 +1,179 @@
+{% extends "agendamento/base.html" %}
+{% load static %}
+
+{% block titulo %}Minhas Consultas — Instituto Vitta{% endblock %}
+
+{% block conteudo %}
+<section class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="section-title mb-1">Minhas Consultas</h2>
+            <p class="section-subtitle mb-0">Acompanhe seus agendamentos futuros e seu histórico de atendimentos.</p>
+        </div>
+        <a href="{% url 'home' %}#profissionais" class="btn btn-vitta">
+            <i class="bi bi-calendar2-plus me-2"></i>Nova Consulta
+        </a>
+    </div>
+
+    <!-- Resumo numérico -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div>
+                    <span class="small text-muted d-block">Próximas consultas</span>
+                    <h4 class="mb-0">{{ total_agendadas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon" style="background-color: #e8f5e9; color: #2e7d32;">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+                <div>
+                    <span class="small text-muted d-block">Concluídas</span>
+                    <h4 class="mb-0">{{ total_concluidas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon" style="background-color: #fdecea; color: #b71c1c;">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div>
+                    <span class="small text-muted d-block">Canceladas</span>
+                    <h4 class="mb-0">{{ total_canceladas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Próximas Consultas -->
+    <h4 class="mb-3"><i class="bi bi-clock me-2 text-vitta"></i>Próximas Consultas</h4>
+    <div class="row g-3 mb-5">
+        {% for consulta in proximas_consultas %}
+        <div class="col-lg-6">
+            <div class="card card-agendamento p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-medico" style="width: 54px; height: 54px; font-size: 1rem;">
+                                {{ consulta.profissional.iniciais }}
+                            </div>
+                            <div>
+                                <h5 class="mb-0">{{ consulta.profissional.nome_exibicao }}</h5>
+                                <span class="small text-muted">{{ consulta.profissional.especialidade.nome }} • {{ consulta.profissional.registro }}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge status-agendada">
+                            <i class="bi bi-dot"></i>Agendada
+                        </span>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 p-3 bg-vitta-mint rounded-3 mb-3">
+                        <span><i class="bi bi-calendar3 me-1 text-vitta"></i><strong>{{ consulta.data|date:"d/m/Y" }}</strong></span>
+                        <span><i class="bi bi-clock me-1 text-vitta"></i><strong>{{ consulta.horario|time:"H:i" }}</strong></span>
+                    </div>
+
+                    {% if consulta.observacoes %}
+                    <p class="small text-muted mb-3">
+                        <i class="bi bi-chat-left-text me-1"></i><strong>Observações:</strong> {{ consulta.observacoes }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalCancelar{{ consulta.id }}">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar consulta
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmação de cancelamento -->
+        <div class="modal fade" id="modalCancelar{{ consulta.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 shadow">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title">Cancelar Consulta</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">
+                            Deseja realmente cancelar sua consulta com <strong>{{ consulta.profissional.nome_exibicao }}</strong>
+                            no dia <strong>{{ consulta.data|date:"d/m/Y" }}</strong> às <strong>{{ consulta.horario|time:"H:i" }}</strong>?
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Manter consulta</button>
+                        <form method="post" action="{% url 'cancelar_consulta' consulta_id=consulta.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger rounded-pill px-4">Confirmar cancelamento</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5 bg-vitta-mint rounded-4">
+                <i class="bi bi-calendar-plus text-vitta fs-1"></i>
+                <p class="mt-3 mb-3 section-subtitle">Você não possui consultas futuras agendadas no momento.</p>
+                <a href="{% url 'home' %}#profissionais" class="btn btn-vitta">Agendar agora</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Histórico de Consultas -->
+    {% if historico_consultas %}
+    <h4 class="mb-3"><i class="bi bi-journal-medical me-2 text-vitta"></i>Histórico de Consultas</h4>
+    <div class="card card-agendamento overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-vitta-mint">
+                    <tr>
+                        <th class="ps-4">Profissional</th>
+                        <th>Especialidade</th>
+                        <th>Data e Horário</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consulta in historico_consultas %}
+                    <tr>
+                        <td class="ps-4 fw-semibold">{{ consulta.profissional.nome_exibicao }}</td>
+                        <td>{{ consulta.profissional.especialidade.nome }}</td>
+                        <td>{{ consulta.data|date:"d/m/Y" }} às {{ consulta.horario|time:"H:i" }}</td>
+                        <td>
+                            {% if consulta.status == 'CONCLUIDA' %}
+                                <span class="status-badge status-concluida">Concluída</span>
+                            {% elif consulta.status == 'CANCELADA' %}
+                                <span class="status-badge status-cancelada">Cancelada</span>
+                            {% else %}
+                                <span class="status-badge status-agendada">Agendada</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'agendar_consulta' profissional_id=consulta.profissional.id %}"
+                               class="btn btn-sm btn-vitta-outline">
+                                Reagendar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends "agendamento/base.html" %}
+{% load static %}
+
+{% block titulo %}Painel do Profissional — Instituto Vitta{% endblock %}
+
+{% block conteudo %}
+<section class="container py-5">
+    <!-- Cabeçalho do Médico -->
+    <div class="card card-agendamento p-4 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-medico">{{ profissional.iniciais }}</div>
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h3 class="mb-0">{{ profissional.nome_exibicao }}</h3>
+                        {% if profissional.ativo %}
+                        <span class="status-badge status-concluida"><i class="bi bi-eye"></i> Visível na vitrine</span>
+                        {% else %}
+                        <span class="status-badge status-cancelada"><i class="bi bi-eye-slash"></i> Oculto na vitrine</span>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0 section-subtitle">
+                        {{ profissional.especialidade.nome }} • Registro: <strong>{{ profissional.registro }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-vitta-outline" data-bs-toggle="modal" data-bs-target="#modalEditarPerfilMedico">
+                <i class="bi bi-pencil-square me-2"></i>Editar Perfil
+            </button>
+        </div>
+    </div>
+
+    <!-- KPIs da Agenda -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta"><i class="bi bi-calendar-event"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Hoje</span>
+                    <h4 class="mb-0">{{ total_hoje }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta"><i class="bi bi-calendar2-check"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Agendadas</span>
+                    <h4 class="mb-0">{{ total_agendadas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon" style="background-color: #e8f5e9; color: #2e7d32;"><i class="bi bi-check2-all"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Concluídas</span>
+                    <h4 class="mb-0">{{ total_concluidas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon" style="background-color: #fdecea; color: #b71c1c;"><i class="bi bi-x-circle"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Canceladas</span>
+                    <h4 class="mb-0">{{ total_canceladas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros da Agenda -->
+    <div class="card card-agendamento p-3 p-md-4 mb-4">
+        <form method="get" action="{% url 'painel_medico' %}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="filtro_status" class="form-label small fw-semibold">Status da consulta</label>
+                <select name="status" id="filtro_status" class="form-select rounded-3">
+                    <option value="TODAS" {% if filtro_status == 'TODAS' %}selected{% endif %}>Todas</option>
+                    <option value="AGENDADA" {% if filtro_status == 'AGENDADA' %}selected{% endif %}>Agendadas</option>
+                    <option value="CONCLUIDA" {% if filtro_status == 'CONCLUIDA' %}selected{% endif %}>Concluídas</option>
+                    <option value="CANCELADA" {% if filtro_status == 'CANCELADA' %}selected{% endif %}>Canceladas</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="filtro_data" class="form-label small fw-semibold">Filtrar por data</label>
+                <input type="date" name="data" id="filtro_data" value="{{ filtro_data }}" class="form-control rounded-3">
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-vitta flex-grow-1">
+                    <i class="bi bi-funnel me-1"></i>Filtrar
+                </button>
+                {% if filtro_status != 'TODAS' or filtro_data %}
+                <a href="{% url 'painel_medico' %}" class="btn btn-vitta-outline">Limpar</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Consultas do Médico -->
+    <h4 class="mb-3"><i class="bi bi-journal-medical me-2 text-vitta"></i>Minha Agenda de Atendimentos</h4>
+    <div class="card card-agendamento overflow-hidden">
+        {% if consultas %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-vitta-mint">
+                    <tr>
+                        <th class="ps-4">Paciente</th>
+                        <th>Data e Horário</th>
+                        <th>Observações</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consulta in consultas %}
+                    <tr>
+                        <td class="ps-4">
+                            <span class="fw-semibold d-block">{{ consulta.paciente.username }}</span>
+                            <small class="text-muted">{{ consulta.paciente.email }}</small>
+                        </td>
+                        <td>
+                            <span class="fw-semibold">{{ consulta.data|date:"d/m/Y" }}</span>
+                            <span class="badge bg-vitta-mint text-vitta ms-1">{{ consulta.horario|time:"H:i" }}</span>
+                        </td>
+                        <td class="small text-muted" style="max-width: 260px;">
+                            {{ consulta.observacoes|default:"—" }}
+                        </td>
+                        <td>
+                            {% if consulta.status == 'AGENDADA' %}
+                                <span class="status-badge status-agendada">Agendada</span>
+                            {% elif consulta.status == 'CONCLUIDA' %}
+                                <span class="status-badge status-concluida">Concluída</span>
+                            {% else %}
+                                <span class="status-badge status-cancelada">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if consulta.status == 'AGENDADA' %}
+                            <div class="d-inline-flex gap-1">
+                                <form method="post" action="{% url 'atualizar_status_consulta' consulta_id=consulta.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="novo_status" value="CONCLUIDA">
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3" title="Marcar como concluída">
+                                        <i class="bi bi-check2"></i> Concluir
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'atualizar_status_consulta' consulta_id=consulta.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="novo_status" value="CANCELADA">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Cancelar consulta">
+                                        <i class="bi bi-x"></i> Cancelar
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="small text-muted">Finalizada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-calendar2-x text-vitta fs-1"></i>
+            <p class="mt-3 mb-0 section-subtitle">Nenhuma consulta encontrada para os filtros selecionados.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Modal Editar Perfil Profissional -->
+<div class="modal fade" id="modalEditarPerfilMedico" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Editar Perfil Profissional</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <form method="post" action="{% url 'painel_medico' %}" class="form-vitta">
+                {% csrf_token %}
+                <input type="hidden" name="acao" value="editar_perfil">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome de exibição</label>
+                        <input type="text" name="nome" class="form-control" value="{{ profissional.nome }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Registro profissional</label>
+                        <input type="text" name="registro" class="form-control" value="{{ profissional.registro }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Especialidade</label>
+                        <select name="especialidade" class="form-select rounded-3" required>
+                            {% for esp in especialidades %}
+                            <option value="{{ esp.id }}" {% if esp.id == profissional.especialidade_id %}selected{% endif %}>
+                                {{ esp.nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apresentação / Bio</label>
+                        <textarea name="bio" rows="3" class="form-control">{{ profissional.bio }}</textarea>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="ativo" id="switchAtivo" {% if profissional.ativo %}checked{% endif %}>
+                        <label class="form-check-label" for="switchAtivo">Exibir meu perfil na página inicial</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-vitta">Salvar alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

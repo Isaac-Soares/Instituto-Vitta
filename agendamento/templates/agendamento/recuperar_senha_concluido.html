@@ -1,0 +1,12 @@
+{% extends "agendamento/base.html" %}
+{% block titulo %}Senha alterada — Instituto Vitta{% endblock %}
+{% block conteudo %}
+<section class="container py-5"><div class="row justify-content-center"><div class="col-md-7 col-lg-6">
+  <div class="card auth-card p-4 p-md-5 text-center">
+    <i class="bi bi-shield-check text-vitta display-4 mb-3"></i>
+    <h4>Senha alterada com sucesso</h4>
+    <p class="section-subtitle">Sua senha foi redefinida. Agora você já pode entrar na sua conta.</p>
+    <a href="{% url 'login' %}" class="btn btn-vitta mt-3">Ir para o login</a>
+  </div>
+</div></div></section>
+{% endblock %}

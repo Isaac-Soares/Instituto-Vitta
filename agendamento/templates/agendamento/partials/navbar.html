@@ -1,0 +1,117 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-vitta sticky-top py-3">
+    <div class="container">
+
+        <!-- Logotipo / marca -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+            <i class="bi bi-heart-pulse-fill text-vitta fs-4"></i>
+            Instituto Vitta<span class="brand-dot">.</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarVitta" aria-controls="navbarVitta"
+                aria-expanded="false" aria-label="Abrir menu de navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarVitta">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}
+                       href="{% url 'home' %}">
+                        <i class="bi bi-house-door me-1"></i> Início
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'especialidades' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'especialidades' %}aria-current="page"{% endif %}
+                       href="{% url 'especialidades' %}">
+                        <i class="bi bi-clipboard2-pulse me-1"></i> Especialidades
+                    </a>
+                </li>
+
+                {% if eh_profissional %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'painel_medico' %}active{% endif %}"
+                       href="{% url 'painel_medico' %}">
+                        <i class="bi bi-clipboard2-check me-1"></i> Minha Agenda
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'minhas_consultas' %}active{% endif %}"
+                       href="{% url 'minhas_consultas' %}">
+                        <i class="bi bi-calendar2-check me-1"></i> Minhas Consultas
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_authenticated and user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'monitoramento_admin' %}active{% endif %}"
+                       href="{% url 'monitoramento_admin' %}">
+                        <i class="bi bi-graph-up-arrow me-1"></i> Monitoramento
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <!-- Menu Dropdown do Usuário Logado -->
+                    <li class="nav-item dropdown ms-lg-2">
+                        <a class="nav-link dropdown-toggle nav-cta" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                            {% if eh_profissional %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'painel_medico' %}">
+                                    <i class="bi bi-clipboard2-check me-2 text-vitta"></i> Painel do Profissional
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'minhas_consultas' %}">
+                                    <i class="bi bi-calendar2-check me-2 text-vitta"></i> Minhas Consultas
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'monitoramento_admin' %}">
+                                    <i class="bi bi-graph-up-arrow me-2 text-vitta"></i> Monitoramento Admin
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin/">
+                                    <i class="bi bi-speedometer2 me-2 text-vitta"></i> Django Admin
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Desconectar
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'cadastro_profissional' %}active{% endif %}"
+                           href="{% url 'cadastro_profissional' %}">
+                            <i class="bi bi-person-badge me-1"></i> Sou Profissional
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="nav-link nav-cta" href="{% url 'login' %}">
+                            <i class="bi bi-person-circle me-1"></i> Entrar / Cadastrar
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

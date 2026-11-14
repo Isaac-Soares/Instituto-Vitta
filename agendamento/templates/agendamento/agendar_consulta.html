@@ -1,0 +1,140 @@
+{% extends "agendamento/base.html" %}
+{% load static %}
+
+{% block titulo %}Agendar Consulta — Instituto Vitta{% endblock %}
+
+{% block conteudo %}
+<section class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="mb-3">
+                <a href="{% url 'home' %}#profissionais" class="text-decoration-none small fw-semibold">
+                    <i class="bi bi-arrow-left me-1"></i>Voltar para profissionais
+                </a>
+            </div>
+
+            <div class="text-center mb-4">
+                <h2 class="section-title">Agendar Consulta</h2>
+                <p class="section-subtitle">Escolha a data e o horário disponível para o seu atendimento.</p>
+            </div>
+
+            <div class="card card-agendamento p-4 p-md-5">
+                <form method="post"
+                      action="{% url 'agendar_consulta' profissional_id=profissional.id %}"
+                      data-api-url="{% url 'api_horarios' profissional_id=profissional.id %}"
+                      id="form-agendamento">
+                    {% csrf_token %}
+
+                    <!-- ===== Resumo do profissional ===== -->
+                    {% if profissional %}
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-4 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-medico">{{ profissional.iniciais }}</div>
+                            <div>
+                                <h5 class="mb-1">{{ profissional.nome_exibicao }}</h5>
+                                <span class="badge-especialidade d-inline-block me-2">
+                                    {{ profissional.especialidade.nome }}
+                                </span>
+                                <span class="registro">Registro: {{ profissional.registro }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- ===== Escolha da data ===== -->
+                    <div class="mb-4">
+                        <label for="id_data_consulta" class="form-label fw-semibold">
+                            <i class="bi bi-calendar3 me-2 text-vitta"></i>Escolha a data
+                        </label>
+                        <input type="date"
+                               name="data_consulta"
+                               id="id_data_consulta"
+                               min="{{ data_minima }}"
+                               value="{{ data_selecionada }}"
+                               class="form-control form-control-lg"
+                               style="max-width: 280px;"
+                               required>
+                        <div class="form-text">Atendimentos de segunda a sábado.</div>
+                    </div>
+
+                    <!-- ===== Escolha do horário ===== -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold d-block">
+                            <i class="bi bi-clock me-2 text-vitta"></i>Escolha o horário
+                        </label>
+
+                        <!-- Legenda -->
+                        <div class="d-flex flex-wrap gap-3 mb-3">
+                            <span class="legenda-item">
+                                <span class="legenda-dot" style="background-color: var(--vitta-blue-700);"></span>
+                                Selecionado
+                            </span>
+                            <span class="legenda-item">
+                                <span class="legenda-dot" style="background-color: #fff; border: 1.5px solid var(--vitta-blue-500);"></span>
+                                Disponível
+                            </span>
+                            <span class="legenda-item">
+                                <span class="legenda-dot" style="background-color: #e3e8e8;"></span>
+                                Indisponível
+                            </span>
+                        </div>
+
+                        <input type="hidden" name="horario_consulta" id="id_horario_consulta">
+
+                        <div class="row g-2" id="grade-horarios">
+                            {% for horario in horarios %}
+                            <div class="col-4 col-sm-3 col-md-2">
+                                <button type="button"
+                                        class="horario-pill {% if horario.ocupado %}ocupado{% endif %}"
+                                        data-hora="{{ horario.hora }}"
+                                        {% if horario.motivo %}title="{{ horario.motivo }}"{% endif %}
+                                        {% if horario.ocupado %}disabled{% endif %}>
+                                    {{ horario.hora }}
+                                </button>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <div class="text-center py-4 px-3 bg-vitta-mint rounded-4">
+                                    <i class="bi bi-calendar-x text-vitta fs-3"></i>
+                                    <p class="mb-0 mt-2 section-subtitle">
+                                        {{ aviso_horarios|default:"Selecione uma data para ver os horários disponíveis." }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- ===== Observações opcionais ===== -->
+                    <div class="mb-4">
+                        <label for="id_observacoes" class="form-label fw-semibold">
+                            <i class="bi bi-chat-left-text me-2 text-vitta"></i>Observações ou motivo da consulta <span class="text-muted fw-normal">(opcional)</span>
+                        </label>
+                        <textarea name="observacoes"
+                                  id="id_observacoes"
+                                  rows="2"
+                                  class="form-control"
+                                  placeholder="Ex.: Primeira consulta, retorno, exames recentes...">{{ observacoes_salvas|default:'' }}</textarea>
+                    </div>
+
+                    <!-- ===== Confirmação ===== -->
+                    <div id="resumo-selecao" class="alert bg-vitta-mint border-0 d-none">
+                        <i class="bi bi-info-circle me-2 text-vitta"></i>
+                        Agendamento selecionado para <strong id="texto-data-selecionada"></strong> às <strong id="texto-horario-selecionado"></strong>.
+                    </div>
+
+                    <button type="submit" class="btn btn-vitta btn-lg w-100 mt-2" id="btn-confirmar-agendamento" disabled>
+                        <i class="bi bi-check2-circle me-2"></i>Confirmar Agendamento
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block js_extra %}
+<script src="{% static 'agendamento/js/agendar.js' %}"></script>
+{% endblock %}

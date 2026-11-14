@@ -1,0 +1,191 @@
+{% extends "agendamento/base.html" %}
+{% load static %}
+
+{% block titulo %}Monitoramento Admin — Instituto Vitta{% endblock %}
+
+{% block conteudo %}
+<section class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="badge-especialidade d-inline-block mb-1">Painel de Acompanhamento</span>
+            <h2 class="section-title mb-1">Monitoramento do Instituto Vitta</h2>
+            <p class="section-subtitle mb-0">Visão em tempo real dos cadastros de pacientes, profissionais e consultas.</p>
+        </div>
+        <a href="/admin/" class="btn btn-vitta">
+            <i class="bi bi-speedometer2 me-2"></i>Abrir Django Admin Completo
+        </a>
+    </div>
+
+    <!-- KPIs Gerais -->
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta"><i class="bi bi-people"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Total Usuários</span>
+                    <h4 class="mb-0">{{ total_usuarios }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta"><i class="bi bi-person-heart"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Pacientes</span>
+                    <h4 class="mb-0">{{ total_pacientes }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta"><i class="bi bi-person-badge"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Profissionais</span>
+                    <h4 class="mb-0">{{ total_profissionais }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card p-3 d-flex align-items-center gap-3">
+                <div class="kpi-icon bg-vitta-mint text-vitta"><i class="bi bi-calendar2-check"></i></div>
+                <div>
+                    <span class="small text-muted d-block">Consultas</span>
+                    <h4 class="mb-0">{{ total_consultas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Últimos Usuários Cadastrados -->
+        <div class="col-lg-6">
+            <div class="card card-agendamento overflow-hidden h-100">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-person-plus me-2 text-vitta"></i>Últimos Cadastros</h5>
+                    <span class="small text-muted">Top 10 mais recentes</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-vitta-mint">
+                            <tr>
+                                <th class="ps-4">Usuário</th>
+                                <th>Perfil</th>
+                                <th class="pe-4 text-end">Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in ultimos_usuarios %}
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="fw-semibold d-block">{{ u.username }}</span>
+                                    <small class="text-muted">{{ u.email|default:"Sem e-mail" }}</small>
+                                </td>
+                                <td>
+                                    {% if u.is_staff %}
+                                        <span class="status-badge status-concluida">Admin</span>
+                                    {% elif u.perfil_profissional %}
+                                        <span class="status-badge status-agendada">Profissional</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border rounded-pill">Paciente</span>
+                                    {% endif %}
+                                </td>
+                                <td class="pe-4 text-end small text-muted">
+                                    {{ u.date_joined|date:"d/m/Y H:i" }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Nenhum usuário cadastrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profissionais e Volume de Consultas -->
+        <div class="col-lg-6">
+            <div class="card card-agendamento overflow-hidden h-100">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clipboard2-pulse me-2 text-vitta"></i>Profissionais na Plataforma</h5>
+                    <span class="small text-muted">{{ profissionais_com_conta }} com login próprio</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-vitta-mint">
+                            <tr>
+                                <th class="ps-4">Profissional</th>
+                                <th>Especialidade</th>
+                                <th class="pe-4 text-end">Consultas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prof in ranking_profissionais %}
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="fw-semibold d-block">{{ prof.nome_exibicao }}</span>
+                                    <small class="text-muted">{{ prof.registro }}</small>
+                                </td>
+                                <td>{{ prof.especialidade.nome }}</td>
+                                <td class="pe-4 text-end">
+                                    <span class="badge bg-vitta-mint text-vitta rounded-pill px-3">
+                                        {{ prof.total_atendimentos }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Nenhum profissional cadastrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas Consultas Registradas -->
+    <div class="card card-agendamento overflow-hidden">
+        <div class="p-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 class="mb-0"><i class="bi bi-activity me-2 text-vitta"></i>Atividade Recente de Agendamentos</h5>
+            <div class="d-flex gap-2 small">
+                <span class="status-badge status-agendada">Agendadas: {{ consultas_agendadas }}</span>
+                <span class="status-badge status-concluida">Concluídas: {{ consultas_concluidas }}</span>
+                <span class="status-badge status-cancelada">Canceladas: {{ consultas_canceladas }}</span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-vitta-mint">
+                    <tr>
+                        <th class="ps-4">Paciente</th>
+                        <th>Profissional</th>
+                        <th>Data / Hora</th>
+                        <th>Status</th>
+                        <th class="pe-4 text-end">Registrado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in ultimas_consultas %}
+                    <tr>
+                        <td class="ps-4 fw-semibold">{{ c.paciente.username }}</td>
+                        <td>{{ c.profissional.nome_exibicao }} <small class="text-muted">({{ c.profissional.especialidade.nome }})</small></td>
+                        <td>{{ c.data|date:"d/m/Y" }} às {{ c.horario|time:"H:i" }}</td>
+                        <td>
+                            {% if c.status == 'AGENDADA' %}
+                                <span class="status-badge status-agendada">Agendada</span>
+                            {% elif c.status == 'CONCLUIDA' %}
+                                <span class="status-badge status-concluida">Concluída</span>
+                            {% else %}
+                                <span class="status-badge status-cancelada">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end small text-muted">{{ c.criado_em|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Nenhuma consulta registrada ainda.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "agendamento/base.html" %}
+{% load static %}
+
+{% block titulo %}Instituto Vitta — Cuidado que combina com você{% endblock %}
+
+{% block conteudo %}
+
+<!-- ===================== HERO ===================== -->
+<section class="hero-vitta py-5 py-lg-6">
+    <div class="container py-4 py-lg-5 position-relative">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-7">
+                <span class="eyebrow">Instituto Vitta</span>
+                <h1 class="display-5 mt-2 mb-3">Sua saúde, agendada em poucos cliques.</h1>
+                <p class="lead">
+                    Marque consultas com os melhores especialistas, acompanhe seus horários
+                    e cuide de você com a agilidade que o Vitta oferece.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="#profissionais" class="btn btn-light-vitta btn-lg">
+                        <i class="bi bi-calendar2-plus me-2"></i>Agendar consulta
+                    </a>
+                    <a href="{% url 'especialidades' %}" class="btn btn-outline-light btn-lg rounded-pill">
+                        <i class="bi bi-clipboard2-pulse me-2"></i>Especialidades
+                    </a>
+                    {% if not eh_profissional %}
+                    <a href="{% url 'cadastro_profissional' %}" class="btn btn-outline-light btn-lg rounded-pill">
+                        <i class="bi bi-person-badge me-2"></i>Cadastrar como Médico
+                    </a>
+                    {% else %}
+                    <a href="{% url 'painel_medico' %}" class="btn btn-outline-light btn-lg rounded-pill">
+                        <i class="bi bi-clipboard2-check me-2"></i>Ir para Minha Agenda
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 text-center">
+                <i class="bi bi-heart-pulse" style="font-size: 12rem; color: rgba(255,255,255,0.15);"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== DIFERENCIAIS ===================== -->
+<section class="container py-5">
+    <div class="row text-center gy-4">
+        <div class="col-md-4">
+            <i class="bi bi-clock-history text-vitta fs-1"></i>
+            <h5 class="mt-3">Agendamento rápido</h5>
+            <p class="section-subtitle small">Escolha data e horário sem sair de casa, em poucos minutos.</p>
+        </div>
+        <div class="col-md-4">
+            <i class="bi bi-patch-check text-vitta fs-1"></i>
+            <h5 class="mt-3">Profissionais qualificados</h5>
+            <p class="section-subtitle small">Especialistas com registro ativo e ampla experiência clínica.</p>
+        </div>
+        <div class="col-md-4">
+            <i class="bi bi-shield-check text-vitta fs-1"></i>
+            <h5 class="mt-3">Dados protegidos</h5>
+            <p class="section-subtitle small">Seu histórico e suas informações tratados com segurança.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== NOSSOS PROFISSIONAIS ===================== -->
+<section id="profissionais" class="container py-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title">Nossos Profissionais</h2>
+        <p class="section-subtitle">Conheça a equipe médica disponível para o seu atendimento.</p>
+    </div>
+
+    <!-- Barra de busca e filtros por especialidade -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
+            <form method="get" action="{% url 'home' %}#profissionais" class="d-flex gap-2 mb-3">
+                {% if especialidade_selecionada %}
+                <input type="hidden" name="especialidade" value="{{ especialidade_selecionada }}">
+                {% endif %}
+                <input type="text" name="q" value="{{ busca }}" class="form-control rounded-pill px-4"
+                       placeholder="Buscar por nome do profissional, especialidade ou registro...">
+                <button type="submit" class="btn btn-vitta px-4">
+                    <i class="bi bi-search"></i>
+                </button>
+                {% if busca or especialidade_selecionada %}
+                <a href="{% url 'home' %}#profissionais" class="btn btn-vitta-outline px-3" title="Limpar filtros">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+                {% endif %}
+            </form>
+
+            {% if especialidades %}
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="{% url 'home' %}{% if busca %}?q={{ busca|urlencode }}{% endif %}#profissionais"
+                   class="filter-pill {% if not especialidade_selecionada %}active{% endif %}">
+                    Todas as especialidades
+                </a>
+                {% for esp in especialidades %}
+                <a href="{% url 'home' %}?especialidade={{ esp.id }}{% if busca %}&q={{ busca|urlencode }}{% endif %}#profissionais"
+                   class="filter-pill {% if especialidade_selecionada == esp.id %}active{% endif %}">
+                    {{ esp.nome }}
+                    <span class="badge rounded-pill {% if especialidade_selecionada == esp.id %}bg-white text-vitta{% else %}bg-vitta-mint text-vitta{% endif %}">
+                        {{ esp.total_medicos }}
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for medico in medicos %}
+        <div class="col-sm-6 col-lg-4">
+            <div class="card card-medico p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="avatar-medico">
+                            {{ medico.iniciais }}
+                        </div>
+                        <div>
+                            <h5 class="mb-0">{{ medico.nome_exibicao }}</h5>
+                            <span class="registro">Registro: {{ medico.registro }}</span>
+                        </div>
+                    </div>
+                    <span class="badge-especialidade d-inline-block mb-3">
+                        <i class="bi bi-clipboard2-pulse me-1"></i>{{ medico.especialidade.nome }}
+                    </span>
+                    {% if medico.bio %}
+                    <p class="small section-subtitle mb-3">{{ medico.bio|truncatewords:20 }}</p>
+                    {% endif %}
+                </div>
+                <a href="{% url 'agendar_consulta' profissional_id=medico.id %}" class="btn btn-vitta w-100 mt-2">
+                    <i class="bi bi-calendar2-check me-2"></i>Agendar com este profissional
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5 bg-vitta-mint rounded-4">
+                <i class="bi bi-search text-vitta fs-1"></i>
+                <p class="mt-3 mb-3 section-subtitle">
+                    {% if busca or especialidade_selecionada %}
+                        Nenhum profissional encontrado com os filtros aplicados.
+                    {% else %}
+                        Nenhum profissional cadastrado no momento. Seja o primeiro a se cadastrar!
+                    {% endif %}
+                </p>
+                {% if busca or especialidade_selecionada %}
+                <a href="{% url 'home' %}#profissionais" class="btn btn-vitta-outline">
+                    Ver todos os profissionais
+                </a>
+                {% else %}
+                <a href="{% url 'cadastro_profissional' %}" class="btn btn-vitta">
+                    <i class="bi bi-person-badge me-2"></i>Cadastrar como Profissional
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

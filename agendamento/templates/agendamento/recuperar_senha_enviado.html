@@ -1,0 +1,12 @@
+{% extends "agendamento/base.html" %}
+{% block titulo %}E-mail enviado — Instituto Vitta{% endblock %}
+{% block conteudo %}
+<section class="container py-5"><div class="row justify-content-center"><div class="col-md-7 col-lg-6">
+  <div class="card auth-card p-4 p-md-5 text-center">
+    <i class="bi bi-envelope-check text-vitta display-4 mb-3"></i>
+    <h4>Verifique seu e-mail</h4>
+    <p class="section-subtitle">Se existir uma conta associada ao endereço informado, enviaremos instruções para redefinir a senha. Confira também a caixa de spam.</p>
+    <a href="{% url 'login' %}" class="btn btn-vitta mt-3">Voltar ao login</a>
+  </div>
+</div></div></section>
+{% endblock %}

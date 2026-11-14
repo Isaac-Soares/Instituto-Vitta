@@ -1,0 +1,369 @@
+/* ==========================================================================
+   Instituto Vitta — Identidade visual
+   Paleta: azul-petróleo profundo + verde-menta suave (saúde, calma, confiança)
+   Tipografia: Poppins (display) + Inter (texto)
+   ========================================================================== */
+
+:root {
+  --vitta-blue-900: #0b3b45;
+  --vitta-blue-700: #0f5c6a;
+  --vitta-blue-500: #14828f;
+  --vitta-green-400: #4fc9a8;
+  --vitta-green-300: #7fdcc0;
+  --vitta-mint-50: #eef9f6;
+  --vitta-ink: #17282c;
+  --vitta-muted: #5c7278;
+  --vitta-bg: #f6faf9;
+  --vitta-white: #ffffff;
+  --vitta-danger: #e2685a;
+
+  --vitta-radius: 14px;
+  --vitta-shadow-sm: 0 2px 10px rgba(11, 59, 69, 0.06);
+  --vitta-shadow-md: 0 10px 30px rgba(11, 59, 69, 0.10);
+}
+
+body {
+  background-color: var(--vitta-bg);
+  color: var(--vitta-ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.font-display {
+  font-family: "Poppins", "Inter", sans-serif;
+  color: var(--vitta-blue-900);
+}
+
+a {
+  color: var(--vitta-blue-500);
+}
+
+/* ---------- Utilitários de marca ---------- */
+.text-vitta { color: var(--vitta-blue-700) !important; }
+.bg-vitta { background-color: var(--vitta-blue-700) !important; }
+.bg-vitta-mint { background-color: var(--vitta-mint-50) !important; }
+
+.btn-vitta {
+  background-color: var(--vitta-blue-700);
+  border-color: var(--vitta-blue-700);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.65rem 1.6rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.btn-vitta:hover,
+.btn-vitta:focus {
+  background-color: var(--vitta-blue-900);
+  border-color: var(--vitta-blue-900);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--vitta-shadow-md);
+}
+
+.btn-vitta-outline {
+  background-color: transparent;
+  border: 1.5px solid var(--vitta-blue-700);
+  color: var(--vitta-blue-700);
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.15s ease;
+}
+.btn-vitta-outline:hover {
+  background-color: var(--vitta-blue-700);
+  color: #fff;
+}
+
+/* ---------- Navbar ---------- */
+.navbar-vitta {
+  background-color: var(--vitta-white);
+  box-shadow: var(--vitta-shadow-sm);
+}
+.navbar-vitta .navbar-brand {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--vitta-blue-900) !important;
+  letter-spacing: -0.02em;
+}
+.navbar-vitta .navbar-brand .brand-dot {
+  color: var(--vitta-green-400);
+}
+.navbar-vitta .nav-link {
+  font-weight: 500;
+  color: var(--vitta-ink) !important;
+  margin: 0 0.15rem;
+  border-radius: 999px;
+  padding: 0.5rem 1rem !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.navbar-vitta .nav-link:hover,
+.navbar-vitta .nav-link.active {
+  background-color: var(--vitta-mint-50);
+  color: var(--vitta-blue-700) !important;
+}
+.navbar-vitta .nav-link.nav-cta {
+  background-color: var(--vitta-blue-700);
+  color: #fff !important;
+}
+.navbar-vitta .nav-link.nav-cta:hover {
+  background-color: var(--vitta-blue-900);
+}
+
+/* ---------- Hero ---------- */
+.hero-vitta {
+  background: linear-gradient(135deg, var(--vitta-blue-900) 0%, var(--vitta-blue-700) 55%, var(--vitta-blue-500) 100%);
+  color: #fff;
+  border-radius: 0 0 32px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-vitta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 85% 20%, rgba(127, 220, 192, 0.25), transparent 45%),
+                     radial-gradient(circle at 10% 90%, rgba(127, 220, 192, 0.15), transparent 40%);
+  pointer-events: none;
+}
+.hero-vitta .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vitta-green-300);
+}
+.hero-vitta h1 {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.hero-vitta p.lead {
+  color: rgba(255, 255, 255, 0.85);
+}
+.hero-vitta .btn-light-vitta {
+  background-color: #fff;
+  color: var(--vitta-blue-900);
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.7rem 1.7rem;
+}
+.hero-vitta .btn-light-vitta:hover {
+  background-color: var(--vitta-mint-50);
+}
+
+/* ---------- Seções ---------- */
+.section-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.section-subtitle {
+  color: var(--vitta-muted);
+}
+
+/* ---------- Cards de médicos ---------- */
+.card-medico {
+  border: none;
+  border-radius: var(--vitta-radius);
+  box-shadow: var(--vitta-shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  overflow: hidden;
+  height: 100%;
+}
+.card-medico:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--vitta-shadow-md);
+}
+.card-medico .avatar-medico {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--vitta-green-300), var(--vitta-blue-500));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+.card-medico .badge-especialidade {
+  background-color: var(--vitta-mint-50);
+  color: var(--vitta-blue-700);
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+}
+.card-medico .registro {
+  color: var(--vitta-muted);
+  font-size: 0.85rem;
+}
+
+/* ---------- Login / Cadastro ---------- */
+.auth-card {
+  border: none;
+  border-radius: var(--vitta-radius);
+  box-shadow: var(--vitta-shadow-md);
+  overflow: hidden;
+}
+.auth-side {
+  background: linear-gradient(160deg, var(--vitta-blue-900), var(--vitta-blue-700));
+  color: #fff;
+  min-height: 100%;
+}
+.nav-tabs-vitta {
+  border-bottom: none;
+  gap: 0.4rem;
+}
+.nav-tabs-vitta .nav-link {
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--vitta-muted);
+  padding: 0.6rem 1.3rem;
+}
+.nav-tabs-vitta .nav-link.active {
+  background-color: var(--vitta-blue-700);
+  color: #fff;
+}
+.form-vitta label {
+  font-weight: 500;
+  color: var(--vitta-ink);
+  font-size: 0.92rem;
+}
+.form-vitta .form-control {
+  border-radius: 10px;
+  border: 1px solid #dce6e6;
+  padding: 0.65rem 0.9rem;
+}
+.form-vitta .form-control:focus {
+  border-color: var(--vitta-blue-500);
+  box-shadow: 0 0 0 0.2rem rgba(20, 130, 143, 0.15);
+}
+
+/* ---------- Agendamento ---------- */
+.card-agendamento {
+  border: none;
+  border-radius: var(--vitta-radius);
+  box-shadow: var(--vitta-shadow-sm);
+}
+.horario-pill {
+  border: 1.5px solid var(--vitta-blue-500);
+  background-color: #fff;
+  color: var(--vitta-blue-700);
+  border-radius: 999px;
+  padding: 0.55rem 0;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.15s ease;
+}
+.horario-pill:hover:not(:disabled) {
+  background-color: var(--vitta-mint-50);
+}
+.horario-pill.selecionado {
+  background-color: var(--vitta-blue-700);
+  border-color: var(--vitta-blue-700);
+  color: #fff;
+}
+.horario-pill:disabled,
+.horario-pill.ocupado {
+  border-color: #e3e8e8;
+  background-color: #f1f4f4;
+  color: #a9b4b6;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+.legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--vitta-muted);
+}
+.legenda-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ---------- Footer ---------- */
+.footer-vitta {
+  background-color: var(--vitta-blue-900);
+  color: rgba(255, 255, 255, 0.75);
+}
+.footer-vitta a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+.footer-vitta a:hover {
+  color: var(--vitta-green-300);
+}
+.footer-vitta .brand-dot {
+  color: var(--vitta-green-400);
+}
+
+/* ---------- Filtros, Badges de Status e Cards de Consulta ---------- */
+.filter-pill {
+  border: 1.5px solid #dce6e6;
+  background-color: var(--vitta-white);
+  color: var(--vitta-ink);
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+.filter-pill:hover {
+  border-color: var(--vitta-blue-500);
+  background-color: var(--vitta-mint-50);
+  color: var(--vitta-blue-700);
+}
+.filter-pill.active {
+  background-color: var(--vitta-blue-700);
+  border-color: var(--vitta-blue-700);
+  color: #fff;
+}
+
+.status-badge {
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.status-agendada {
+  background-color: #e6f4f1;
+  color: var(--vitta-blue-700);
+}
+.status-concluida {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+.status-cancelada {
+  background-color: #fdecea;
+  color: #b71c1c;
+}
+
+.kpi-card {
+  border: none;
+  border-radius: var(--vitta-radius);
+  box-shadow: var(--vitta-shadow-sm);
+  background-color: var(--vitta-white);
+}
+.kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
